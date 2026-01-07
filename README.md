@@ -34,6 +34,11 @@ Profitez d'un éditeur horizontal moderne basé sur une métaphore de **"Lego Au
 2.  **Activer GitHub Pages** dans `Settings > Pages` sur la branche `main`.
 3.  **C'est prêt !** Votre studio est accessible à l'URL fournie par GitHub.
 
+### Hébergement (GitLab Pages)
+1.  **Créez** un nouveau projet sur GitLab et poussez-y les fichiers (le fichier `.gitlab-ci.yml` est déjà configuré).
+2.  **Le déploiement** se fera automatiquement grâce au Pipeline CI/CD.
+3.  **Accédez** à votre site via `Deploy > Pages` dans le menu latéral de GitLab.
+
 ### Développement Local
 ```bash
 # Clonez le dépôt
@@ -67,4 +72,4 @@ Cette application est conforme au RGPD par conception :
 Sous licence [MIT](LICENSE).
 
 ---
-*Fait avec ❤️ pour les podcasteurs indépendants.*
+*Fait avec ❤️ pour les podcasteurs indépendants de l'éducation nationale.*
