@@ -1,19 +1,10 @@
-# .gitlab-ci.yml pour PodStudio Static
-# Cette configuration permet de déployer l'application sur GitLab Pages
-
-image: node:lts
-
-pages:
-  stage: deploy
-  script:
-    # Création du dossier "public" requis par GitLab Pages
-    - mkdir .public
-    # On copie les fichiers nécessaires dans le dossier temporaire
-    - cp -r * .public
-    # On renomme pour que ce soit le dossier final propre
-    - mv .public public
-  artifacts:
-    paths:
-      - public
+# The Docker image that will be used to build your app
+image: .gitlab-ci.yml
+create-pages:
+  pages:
+    # The folder that contains the files to be exposed at the Page URL
+    publish: public
   rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    # This ensures that only pushes to the default branch will trigger
+    # a pages deploy
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
