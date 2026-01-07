@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Podcast Studio Static</title>
+    <meta name="description" content="Studio de podcast statique, sécurisé et 100% navigateur via GitHub Pages.">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0b0b0b">
+</head>
+
+<body>
+    <!-- 1. Header Global -->
+    <header class="app-header">
+        <div class="logo">
+            <span class="logo-icon">🎙️</span>
+            <span class="logo-text">PodStudio</span>
+            <span class="badge">Static</span>
+        </div>
+        <div class="header-actions">
+            <!-- Reserved for User/Global actions -->
+        </div>
+    </header>
+
+    <div class="app-layout">
+        <!-- 2. Sidebar Navigation (Left) -->
+        <aside class="app-sidebar">
+            <nav class="main-nav">
+                <button id="nav-guide" class="nav-btn active" title="Guide">
+                    <span class="icon">📖</span>
+                    <span class="label">Guide</span>
+                </button>
+                <button id="nav-record" class="nav-btn" title="Studio">
+                    <span class="icon">🔴</span>
+                    <span class="label">Studio</span>
+                </button>
+
+                <button id="nav-editor" class="nav-btn" title="Éditeur">
+                    <span class="icon">✂️</span>
+                    <span class="label">Éditeur</span>
+                </button>
+                <button id="nav-episodes" class="nav-btn" title="Épisodes">
+                    <span class="icon">🚀</span>
+                    <span class="label">Épisodes</span>
+                </button>
+                <div class="nav-spacer"></div>
+                <button id="nav-settings" class="nav-btn" title="Paramètres">
+                    <span class="icon">⚙️</span>
+                    <span class="label">Paramètres</span>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- 3. Main Content Area -->
+        <main id="app-content">
+            <div class="view-wrapper">
+                <!-- VIEW: STUDIO DASHBOARD -->
+                <section id="view-record" class="view hidden">
+                    <div class="studio-main">
+                        <div class="visualizer-card">
+                            <canvas id="audio-visualizer"></canvas>
+                            <div class="timer-overlay">
+                                <div class="timer-display">00:00:00</div>
+                                <div id="recording-status" class="status-badge">Prêt</div>
+                            </div>
+                        </div>
+
+                        <div class="controls-card">
+                            <button id="btn-record" class="record-btn-lg" aria-label="Enregistrer">
+                                <div class="record-inner"></div>
+                            </button>
+
+                            <div class="secondary-controls">
+                                <button id="btn-pause" class="ctrl-btn pause-btn hidden" aria-label="Pause">
+                                    ⏸️
+                                </button>
+                                <button id="btn-stop" class="ctrl-btn stop-btn hidden" aria-label="Arrêter">
+                                    ⏹️
+                                </button>
+                            </div>
+                            <p class="hint-text">Appuyez pour commencer</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Library View (Hidden in Nav but kept for code compatibility if needed, though merged above) -->
+                <!-- Note: JS targets 'view-library' for switching. Since we merged lib into Studio, 
+                    we can handle the 'nav-library' click to just focus the sidebar or do nothing.
+                    Actually, let's remove the dedicated View Library and 'nav-library' button is gone from my new HTML above.
+                    Wait, I removed 'nav-library' from the list above. 
+                    Existing JS might try to swap to 'view-library'. I should ensure 'view-library' exists or update JS. 
+                    Ideally: The Studio IS the library view. 
+                    Implementation: I will keep a dummy hidden section for view-library to prevent JS errors, 
+                    or better: I'll map 'nav-library' clicks in JS later.
+                    For now, let's strictly follow the generic IDs. -->
+
+                <!-- VIEW: EDITOR (Vertical Timeline) -->
+                <section id="view-editor" class="view hidden editor-view-layout">
+                    <div class="editor-main-canvas">
+                        <div class="section-header">
+                            <h2>Éditeur</h2>
+                            <div class="header-tools">
+                                <button id="btn-export-mix" class="btn primary btn-sm">Exporter</button>
+                            </div>
+                        </div>
+
+                        <div class="editor-workspace">
+                            <div class="editor-toolbar">
+                                <div class="transport-controls">
+                                    <button id="btn-editor-play" class="btn-transport">▶️</button>
+                                    <button id="btn-editor-stop" class="btn-transport">⏹️</button>
+                                    <span id="editor-time">00:00</span>
+                                </div>
+                            </div>
+
+                            <div class="timeline-workspace horizontal">
+                                <div class="timeline-header-sticky">
+                                    <div id="timeline-ruler" class="timeline-ruler-horizontal"></div>
+                                </div>
+                                <div id="timeline-tracks" class="timeline-container timeline-tracks-horizontal">
+                                    <div class="timeline-tracks-content">
+                                        <div id="timeline-playhead" class="playhead-vertical"></div>
+                                        <div class="empty-timeline-hint">
+                                            <p>Glissez-déposez vos enregistrements ici pour les monter.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW: GUIDE (Default) -->
+                <section id="view-guide" class="view active">
+                    <div class="section-header">
+                        <h2>Comment débuter ?</h2>
+                    </div>
+                    <div class="guide-grid">
+                        <div class="guide-card">
+                            <div class="guide-number">1</div>
+                            <div class="guide-content">
+                                <h3>Enregistrez vos voix</h3>
+                                <p>Allez dans l'onglet <strong>Studio</strong>. Cliquez sur le gros bouton rouge pour
+                                    commencer votre enregistrement. Vous pouvez mettre en pause ou arrêter à tout
+                                    moment.</p>
+                            </div>
+                        </div>
+                        <div class="guide-card">
+                            <div class="guide-number">2</div>
+                            <div class="guide-content">
+                                <h3>Gérez votre bibliothèque</h3>
+                                <p>Vous pouvez ajouter des fichiers .wav ou.mp3 dans la <strong>Bibliothèque.</strong> Tous vos enregistrements et fichiers importés se trouvent dans la
+                                    <strong>Bibliothèque</strong> (à droite). Vous pouvez les renommer ou les supprimer
+                                    facilement.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="guide-card">
+                            <div class="guide-number">3</div>
+                            <div class="guide-content">
+                                <h3>Montez votre épisode</h3>
+                                <p>Allez dans l'onglet <strong>Éditeur</strong>. Glissez-déposez vos segments depuis la
+                                    bibliothèque sur la timeline. Ajustez l'ordre, le volume et les fondus (fades).</p>
+                            </div>
+                        </div>
+                        <div class="guide-card">
+                            <div class="guide-number">4</div>
+                            <div class="guide-content">
+                                <h3>Exportez et Partagez</h3>
+                                <p>Une fois satisfait, vérifiez vos informations dans l'onglet
+                                    <strong>Paramètres</strong> (titre, auteur, description) car elles seront incluses
+                                    dans votre flux. Ensuite, cliquez sur <strong>Exporter</strong> dans l'onglet <strong>Editeur</strong>.
+                                    Votre mix final sera sauvegardé dans l'onglet <strong>Épisodes</strong>, prêt à être
+                                    téléchargé !</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="guide-footer">
+                        <p>💡 <em>Astuce : Tout est stocké localement dans votre navigateur. Pensez à exporter vos
+                                mixages finaux !</em></p>
+                    </div>
+                </section>
+
+                <!-- VIEW: EPISODES -->
+                <section id="view-episodes" class="view hidden">
+                    <div class="section-header">
+                        <h2>Épisodes Publiés</h2>
+                        <button id="btn-export-all" class="btn secondary">RSS XML</button>
+                    </div>
+                    <div id="episodes-list" class="episodes-grid-layout">
+                        <p class="empty-state">Aucun épisode publié.</p>
+                    </div>
+                </section>
+
+                <!-- VIEW: SETTINGS -->
+                <section id="view-settings" class="view hidden">
+                    <div class="max-w-md centered-panel">
+                        <h2>Paramètres</h2>
+                        <div class="settings-card">
+                            <form id="settings-form">
+                                <div class="form-group">
+                                    <label for="set-title">Titre</label>
+                                    <input type="text" id="set-title" placeholder="Mon Podcast">
+                                </div>
+                                <div class="form-group">
+                                    <label for="set-desc">Description</label>
+                                    <textarea id="set-desc" rows="3"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="set-author">Auteur</label>
+                                    <input type="text" id="set-author">
+                                </div>
+                                <button type="submit" id="btn-save-settings"
+                                    class="btn primary full-width">Sauvegarder</button>
+                            </form>
+                        </div>
+
+                        <div class="settings-card danger-zone">
+                            <progress id="storage-quota" value="0" max="100"></progress>
+                            <span id="storage-text">Calcul...</span>
+                            <button id="btn-delete-all" class="btn danger full-width">Réinitialiser</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right: Common Library Sidebar -->
+            <aside class="app-library-sidebar">
+                <div class="panel-header">
+                    <h3>Bibliothèque</h3>
+                    <input type="file" id="inp-import-file" accept="audio/mp3,audio/wav,audio/*" style="display:none"
+                        multiple>
+                    <button id="btn-import-file" class="btn secondary btn-sm" title="Importer des fichiers">+
+                        Import</button>
+                </div>
+                <!-- ID kept for JS compatibility -->
+                <div id="library-list" class="library-list-container">
+                    <p class="empty-state">Chargement...</p>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="vendor/lame.min.js"></script>
+    <script type="module" src="js/app.js"></script>
+</body>
+
+</html>

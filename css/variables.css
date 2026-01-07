@@ -1,0 +1,97 @@
+:root {
+    /* Colors - Premium Dark Theme */
+    --bg-main: #0b0b0b;
+    --bg-secondary: #0b0b0b;
+    /* Unified background for cleaner look */
+    --bg-card: #161618;
+    --bg-card-hover: #202022;
+    --bg-surface: #1e1e1e;
+    /* Visualizer bg etc */
+
+    /* Brand Colors */
+    --primary: #8940fa;
+    /* Vivid Purple */
+    --primary-hover: #a26bfb;
+    --primary-rgb: 137, 64, 250;
+
+    --accent: #ff0055;
+    /* Recording Red */
+    --accent-hover: #ff3377;
+    --accent-rgb: 255, 0, 85;
+
+    /* Text Colors */
+    --text-main: #ffffff;
+    --text-muted: #888888;
+    --text-dark: #000000;
+
+    /* Status Colors */
+    --success: #00e676;
+    --warning: #ffb300;
+    --danger: #cf6679;
+
+    /* Clip Colors (Anchor.fm style) */
+    --clip-recording: #8940fa;
+    /* Violet */
+    --clip-import: #4ade80;
+    /* Green */
+    --clip-music: #ffb300;
+    /* Amber */
+    --clip-outro: #cf6679;
+    /* Pink */
+
+    /* Layout & Spacing */
+    --header-height: 64px;
+    --gap-layout: 24px;
+    --container-max-width: 1400px;
+
+    /* UI Elements */
+    --border-color: #333333;
+    --border-light: rgba(255, 255, 255, 0.1);
+
+    /* Radius */
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    /* Cards */
+    --radius-lg: 24px;
+    --radius-full: 9999px;
+
+    /* Shadows */
+    --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.2);
+    --shadow-glow: 0 0 20px rgba(137, 64, 250, 0.3);
+
+    /* Typography */
+    --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.25rem;
+    --font-size-xl: 1.5rem;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: var(--font-family);
+    margin: 0;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--bg-card-hover);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--border-color);
+}
