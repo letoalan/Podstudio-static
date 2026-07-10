@@ -48,18 +48,26 @@ function setupEventListeners() {
 async function togglePause() {
     if (!mediaRecorder) return;
 
-    if (mediaRecorder.state === 'recording') {
-        mediaRecorder.pause();
-        isPaused = true;
-        clearInterval(timerInterval);
-        elapsedTime += Date.now() - startTime;
-        updateUIState(true);
-    } else if (mediaRecorder.state === 'paused') {
-        mediaRecorder.resume();
-        isPaused = false;
-        startTime = Date.now();
-        startTimer();
-        updateUIState(true);
+    try {
+        if (mediaRecorder.state === 'recording') {
+            mediaRecorder.pause();
+            isPaused = true;
+            clearInterval(timerInterval);
+            elapsedTime += Date.now() - startTime;
+            updateUIState(true);
+            console.log('Enregistrement mis en pause');
+        } else if (mediaRecorder.state === 'paused') {
+            mediaRecorder.resume();
+            isPaused = false;
+            startTime = Date.now();
+            startTimer();
+            drawVisualizer(); // Restart visualizer
+            updateUIState(true);
+            console.log('Enregistrement repris');
+        }
+    } catch (err) {
+        console.error('Erreur lors de la pause/reprise:', err);
+        alert('Impossible de mettre en pause. Veuillez vérifier les permissions audio.');
     }
 }
 

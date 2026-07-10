@@ -58,7 +58,7 @@ export class PodcastRecorder extends HTMLElement {
     render() {
         this.shadowRoot.innerHTML = `
             <style>
-                @import url('css/variables.css');
+                @import url('/css/variables.css');
                 
                 :host {
                     display: block;
@@ -69,7 +69,7 @@ export class PodcastRecorder extends HTMLElement {
 
                 .recorder-container {
                     background: var(--bg-card);
-                    border-radius: var(--border-radius-lg);
+                    border-radius: var(--radius-lg);
                     padding: 2rem;
                     text-align: center;
                     position: relative;
@@ -88,7 +88,7 @@ export class PodcastRecorder extends HTMLElement {
                     width: 100%;
                     height: 120px;
                     background: var(--bg-secondary);
-                    border-radius: var(--border-radius-md);
+                    border-radius: var(--radius-md);
                     margin-bottom: 2rem;
                 }
 
@@ -118,7 +118,7 @@ export class PodcastRecorder extends HTMLElement {
                     cursor: pointer;
                     font-weight: 600;
                     padding: 1rem 3rem;
-                    border-radius: var(--border-radius-full);
+                    border-radius: var(--radius-full);
                     font-size: 1.1rem;
                     transition: transform 0.1s, background-color 0.2s;
                     display: inline-flex;
@@ -141,7 +141,7 @@ export class PodcastRecorder extends HTMLElement {
                 }
 
                 .btn-stop {
-                    background-color: var(--secondary);
+                    background-color: var(--bg-secondary);
                     color: var(--accent);
                     border: 2px solid var(--accent);
                     display: none;
