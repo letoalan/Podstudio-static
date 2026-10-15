@@ -8,7 +8,7 @@ pages:
   script:
     # 1. Création d'un dossier temporaire caché pour éviter les erreurs de récursion
     - mkdir .public
-    # 2. Copie de tous les fichiers existants du projet
+    # 2. Copie de tous les fichiers existants du projet sans planter
     - cp -r * .public
     # 3. Renommage vers le dossier public final requis par Pages
     - mv .public public
