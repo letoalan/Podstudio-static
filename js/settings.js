@@ -31,17 +31,30 @@ function setupEventListeners() {
 }
 
 function saveFormSettings() {
+    const current = Storage.getSettings();
     const settings = {
-        title: getVal('set-title'),
-        description: getVal('set-desc'),
-        author: getVal('set-author'),
-        email: getVal('set-email'),
-        language: getVal('set-lang')
+        ...current,
+        title: getVal('set-title', current.title),
+        description: getVal('set-desc', current.description),
+        author: getVal('set-author', current.author),
+        email: getVal('set-email', current.email),
+        language: getVal('set-lang', current.language)
     };
 
     Storage.saveSettings(settings); // Sync save to localStorage
 
-    // Feedback UI
+    // Feedback UI sur le bouton
+    const btnSave = document.getElementById('btn-save-settings');
+    if (btnSave) {
+        const originalText = btnSave.textContent;
+        btnSave.textContent = '✓ Sauvegardé !';
+        btnSave.disabled = true;
+        setTimeout(() => {
+            btnSave.textContent = originalText;
+            btnSave.disabled = false;
+        }, 1500);
+    }
+
     const status = document.getElementById('save-status');
     if (status) {
         status.textContent = 'Sauvegardé !';
@@ -53,8 +66,9 @@ function saveFormSettings() {
 }
 
 // Helpers
-function getVal(id) {
-    return document.getElementById(id).value;
+function getVal(id, fallback = '') {
+    const el = document.getElementById(id);
+    return el ? el.value : fallback;
 }
 
 function setVal(id, val) {
