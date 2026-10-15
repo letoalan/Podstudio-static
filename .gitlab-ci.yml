@@ -6,11 +6,13 @@ image: alpine:latest
 pages:
   stage: deploy
   script:
-    # 1. Création du dossier cible pour GitLab Pages
-    - mkdir -p public
-    # 2. Copie explicite des fichiers et dossiers de l'application statique
-    - cp -r index.html manifest.json sw.js css js assets vendor public/
-    # 3. Inclusion du fichier .nojekyll pour désactiver le traitement Jekyll
+    # 1. Création d'un dossier temporaire caché pour éviter les erreurs de récursion
+    - mkdir .public
+    # 2. Copie de tous les fichiers existants du projet sans planter
+    - cp -r * .public
+    # 3. Renommage vers le dossier public final requis par Pages
+    - mv .public public
+    # 4. Inclusion du fichier .nojekyll s'il existe
     - cp -f .nojekyll public/ 2>/dev/null || true
   artifacts:
     paths:
@@ -18,4 +20,3 @@ pages:
   rules:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
     - if: '$CI_COMMIT_BRANCH == "main"'
-
