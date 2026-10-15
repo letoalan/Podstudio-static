@@ -1,0 +1,52 @@
+/* Rôle : reset, typographie, focus visible, scrollbars et classes utilitaires globales. */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { color-scheme: dark; -webkit-text-size-adjust: 100%; }
+
+body {
+  background: radial-gradient(1200px 600px at 80% -10%, rgba(137, 64, 250, 0.12), transparent 60%), var(--bg-main);
+  color: var(--text-main);
+  font-family: var(--font-family);
+  font-size: 15px;
+  line-height: 1.5;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; }
+h2 { font-size: 1.35rem; }
+h3 { font-size: 1.02rem; }
+p { color: var(--text-secondary); }
+button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; }
+input, textarea, select { font: inherit; color: inherit; }
+audio { width: 100%; height: 36px; }
+
+:focus-visible {
+  outline: 2px solid var(--primary-hover);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: var(--bg-card-hover); border-radius: 10px; border: 2px solid var(--bg-main); }
+::-webkit-scrollbar-thumb:hover { background: var(--primary-dim); }
+
+.hidden { display: none !important; }
+[hidden] { display: none !important; }
+.mob-only { display: none; }
+.no-scroll { overflow: hidden; }
+.full-width { width: 100%; }
+.empty-state { color: var(--text-muted); text-align: center; padding: var(--space-5) var(--space-3); }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

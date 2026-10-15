@@ -1,0 +1,28 @@
+/* Rôle : bibliothèque (cartes d'enregistrements) et vue Épisodes (grille de cartes). */
+.lib-list { display: flex; flex-direction: column; gap: var(--space-3); }
+.lib-item {
+  display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-3);
+  background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: var(--radius-md);
+  cursor: grab; transition: border-color var(--t-fast), transform var(--t-fast) var(--ease), background var(--t-fast);
+}
+.lib-item:hover { border-color: var(--primary-glow); background: var(--bg-card-hover); }
+.lib-item:active { cursor: grabbing; transform: scale(0.99); }
+.lib-head { display: flex; align-items: center; gap: var(--space-2); min-width: 0; }
+.lib-title {
+  flex: 1; min-width: 0; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  border-bottom: 1px dashed transparent;
+}
+.lib-title:hover { border-bottom-color: var(--text-muted); cursor: text; }
+.lib-rename { flex: 1; padding: 4px 8px !important; }
+.lib-dur { font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-muted); }
+.lib-actions { display: flex; gap: var(--space-2); justify-content: space-between; flex-wrap: wrap; }
+
+.episodes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-4); }
+.episode-card {
+  display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4);
+  background: linear-gradient(160deg, var(--bg-card), var(--bg-secondary));
+  border: 1px solid var(--glass-border); border-radius: var(--radius-lg);
+  transition: transform var(--t-med) var(--ease), box-shadow var(--t-med);
+}
+.episode-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.episode-meta { font-size: 0.82rem; color: var(--text-muted); }

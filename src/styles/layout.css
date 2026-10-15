@@ -1,0 +1,81 @@
+/* Rôle : grille de l'application (header, sidebar, zone de vues, panneau bibliothèque, bottom nav, volet mobile). */
+.app-header {
+  height: var(--header-height);
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 var(--space-5);
+  background: rgba(8, 8, 16, 0.85);
+  backdrop-filter: blur(var(--glass-blur));
+  border-bottom: 1px solid var(--glass-border);
+  position: relative; z-index: 20;
+}
+.app-header::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--primary-glow) 30%, var(--primary-glow) 70%, transparent);
+}
+.logo { display: flex; align-items: center; gap: 10px; font-size: 1.15rem; }
+.logo-icon { filter: drop-shadow(0 0 8px var(--primary-glow)); }
+.logo-text {
+  font-weight: 800;
+  background: linear-gradient(135deg, #fff 40%, var(--primary-hover));
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.badge {
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 999px; color: var(--primary-hover);
+  background: var(--primary-dim); border: 1px solid var(--primary-glow);
+}
+
+.app-layout { flex: 1; min-height: 0; display: grid; grid-template-columns: var(--sidebar-width) 1fr; }
+
+.app-sidebar { background: var(--bg-secondary); border-right: 1px solid var(--glass-border); padding: var(--space-4) var(--space-3); }
+.main-nav { display: flex; flex-direction: column; gap: var(--space-1); height: 100%; }
+.nav-spacer { flex: 1; }
+.nav-btn {
+  display: flex; align-items: center; gap: var(--space-3);
+  padding: 11px 14px; border-radius: var(--radius-md);
+  color: var(--text-secondary); font-weight: 600; text-align: left;
+  transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast) var(--ease);
+  position: relative;
+}
+.nav-btn:hover { background: var(--primary-dim); color: var(--text-main); transform: translateX(2px); }
+.nav-btn.active { background: var(--primary-dim); color: var(--text-main); box-shadow: inset 0 0 0 1px var(--primary-glow); }
+.nav-btn.active::before {
+  content: ''; position: absolute; left: -12px; top: 22%; bottom: 22%; width: 3px;
+  background: var(--primary); border-radius: 3px; box-shadow: var(--shadow-glow);
+}
+.nav-btn .icon { font-size: 1.15rem; width: 1.5rem; text-align: center; }
+
+#app-content { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr var(--library-width); }
+.view-wrapper { overflow-y: auto; padding: var(--space-5) var(--space-6); min-width: 0; }
+.view { animation: view-in var(--t-med) var(--ease); max-width: 1100px; margin: 0 auto; }
+@keyframes view-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.section-header {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
+  margin-bottom: var(--space-4); flex-wrap: wrap;
+}
+.header-actions { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+.project-controls { display: flex; align-items: center; gap: var(--space-2); }
+
+.app-library {
+  border-left: 1px solid var(--glass-border); background: var(--bg-secondary);
+  overflow-y: auto; padding: var(--space-4);
+}
+.panel-header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); margin-bottom: var(--space-3); }
+
+.mobile-bottom-nav { display: none; }
+
+.library-modal {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+  max-height: 82dvh; display: flex; flex-direction: column;
+  background: var(--bg-secondary); border-top: 1px solid var(--primary-glow);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.6);
+  transform: translateY(105%); visibility: hidden;
+  transition: transform var(--t-med) var(--ease), visibility 0s linear var(--t-med);
+}
+.library-modal.open { transform: none; visibility: visible; transition-delay: 0s; }
+.modal-header { display: flex; align-items: center; justify-content: space-between; padding: var(--space-3) var(--space-4) 0; }
+.modal-grip { flex: 1; height: 4px; max-width: 48px; margin: 0 auto; background: var(--text-muted); border-radius: 4px; }
+.modal-content { overflow-y: auto; padding: var(--space-3) var(--space-4) var(--space-5); }

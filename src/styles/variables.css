@@ -1,0 +1,68 @@
+/* Rôle : tokens du design system « dark studio » (couleurs, espacements, rayons, ombres, tailles de layout). */
+:root {
+  /* Fonds en couches pour la profondeur */
+  --bg-main: #080810;
+  --bg-secondary: #0f0f17;
+  --bg-card: #15151f;
+  --bg-card-hover: #1d1d2a;
+  --bg-surface: #1a1a25;
+
+  /* Effet verre */
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: 12px;
+
+  /* Marque */
+  --primary: #8940fa;
+  --primary-hover: #a26bfb;
+  --primary-dim: rgba(137, 64, 250, 0.14);
+  --primary-glow: rgba(137, 64, 250, 0.38);
+  --accent: #ff0055;
+  --accent-hover: #ff3377;
+  --accent-dim: rgba(255, 0, 85, 0.14);
+
+  /* Texte */
+  --text-main: #f0f0f8;
+  --text-secondary: #b0b0c0;
+  --text-muted: #6c6c82;
+
+  /* États */
+  --success: #22d3a5;
+  --warning: #ffb300;
+  --danger: #ef4477;
+  --danger-dim: rgba(239, 68, 119, 0.12);
+
+  /* Clips de la timeline */
+  --clip-record: #8940fa;
+  --clip-import: #22d3a5;
+
+  /* Typographie */
+  --font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* Rayons, espacements, ombres */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-glow: 0 0 24px var(--primary-glow);
+
+  /* Layout */
+  --header-height: 56px;
+  --sidebar-width: 208px;
+  --library-width: 340px;
+  --bottom-nav-height: 64px;
+  --lane-height: 76px;
+  --label-width: 84px;
+
+  /* Mouvement */
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --t-fast: 140ms;
+  --t-med: 260ms;
+}

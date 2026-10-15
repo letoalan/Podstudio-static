@@ -1,18 +1,19 @@
-# .gitlab-ci.yml pour PodStudio Static sur La Forge des Communs Numériques Éducatifs
-# Déploiement automatique sur GitLab Pages
+# .gitlab-ci.yml pour PodStudio sur La Forge des Communs Numériques Éducatifs
+# Build Vite et déploiement automatique sur GitLab Pages
 
-image: alpine:latest
+image: node:20-alpine
 
 pages:
   stage: deploy
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
   script:
-    # 1. Création d'un dossier temporaire caché pour éviter les erreurs de récursion
-    - mkdir .public
-    # 2. Copie de tous les fichiers existants du projet sans planter
-    - cp -r * .public
-    # 3. Renommage vers le dossier public final requis par Pages
-    - mv .public public
-    # 4. Inclusion du fichier .nojekyll s'il existe
+    - npm ci
+    - npm run ci
+    - rm -rf public
+    - mv dist public
     - cp -f .nojekyll public/ 2>/dev/null || true
   artifacts:
     paths:
