@@ -1,19 +1,22 @@
-# .gitlab-ci.yml pour PodStudio Static
-# Cette configuration permet de déployer l'application sur GitLab Pages
+# .gitlab-ci.yml pour PodStudio Static sur La Forge des Communs Numériques Éducatifs
+# Déploiement automatique sur GitLab Pages
 
-image: node:lts
+image: alpine:latest
 
 pages:
   stage: deploy
   script:
-    # Création du dossier "public" requis par GitLab Pages
+    # 1. Création d'un dossier temporaire caché pour éviter les erreurs de récursion
     - mkdir .public
-    # On copie les fichiers nécessaires dans le dossier temporaire
+    # 2. Copie de tous les fichiers existants du projet
     - cp -r * .public
-    # On renomme pour que ce soit le dossier final propre
+    # 3. Renommage vers le dossier public final requis par Pages
     - mv .public public
+    # 4. Inclusion du fichier .nojekyll s'il existe
+    - cp -f .nojekyll public/ 2>/dev/null || true
   artifacts:
     paths:
       - public
   rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_BRANCH == "main"'
