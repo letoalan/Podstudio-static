@@ -1,0 +1,159 @@
+/* Rôle : styles de l'éditeur de timeline par bloc (en-tête, pistes, briques de clips, poignées de trim, curseur). */
+.editor-shell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border);
+}
+
+.editor-shell-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.editor-block-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main);
+  flex: 1;
+}
+
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  padding: var(--space-2);
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+}
+
+.transport-group, .history-group, .edit-group, .zoom-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.editor-tracks-host {
+  position: relative;
+  background: var(--bg-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+  min-height: 200px;
+}
+
+.timeline-track-row {
+  display: flex;
+  min-height: 64px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.track-header {
+  width: 130px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 6px 10px;
+  background: var(--bg-card);
+  border-right: 1px solid var(--glass-border);
+  gap: 4px;
+}
+
+.track-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.track-controls { display: flex; align-items: center; gap: 6px; }
+.track-vol-slider { width: 52px; accent-color: var(--primary); }
+
+.btn-track-toggle {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-track-toggle.active {
+  background: var(--warning);
+  color: #000;
+  border-color: var(--warning);
+}
+
+.timeline-track-lane {
+  position: relative;
+  flex: 1;
+  min-height: 64px;
+}
+
+.timeline-clip {
+  position: absolute;
+  top: 8px;
+  height: 48px;
+  background: var(--primary);
+  border-radius: 6px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  cursor: grab;
+  user-select: none;
+}
+
+.timeline-clip.selected {
+  outline: 2px solid #fff;
+  box-shadow: 0 0 12px var(--primary-glow);
+}
+
+.clip-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.clip-duration { font-size: 0.7rem; opacity: 0.8; }
+
+.clip-trim-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  cursor: ew-resize;
+  background: rgba(255, 255, 255, 0.2);
+  transition: background var(--t-fast);
+}
+
+.clip-trim-handle:hover { background: rgba(255, 255, 255, 0.5); }
+.clip-trim-handle.start { left: 0; border-radius: 6px 0 0 6px; }
+.clip-trim-handle.end { right: 0; border-radius: 0 6px 6px 0; }
+.timeline-clip.is-dragging {
+  opacity: 0.85;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  cursor: grabbing;
+  z-index: 40;
+}
+.timeline-ruler { position: relative; height: 28px; background: var(--bg-card); border-bottom: 1px solid var(--glass-border); user-select: none; }
+.ruler-tick { position: absolute; top: 0; bottom: 0; border-left: 1px solid var(--glass-border); padding-left: 4px; }
+.ruler-label { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); }
+.timeline-playhead { position: absolute; top: 0; bottom: 0; z-index: 10; pointer-events: none; }
+.timeline-playhead-line { width: 2px; height: 100%; background: var(--accent); }
+.timeline-playhead-handle { width: 12px; height: 12px; background: var(--accent); border-radius: 0 0 4px 4px; transform: translateX(-5px); cursor: grab; pointer-events: auto; }

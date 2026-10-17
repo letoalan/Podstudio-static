@@ -10,6 +10,7 @@ vue Paramètres — formulaire de métadonnées, jauge de stockage (alerte à 80
 - `../../core/format.js`
 - `../dom.js`
 - `../toast.js`
+- `../palette-editor.js`
 
 ## API Publique
 - `FIELDS`

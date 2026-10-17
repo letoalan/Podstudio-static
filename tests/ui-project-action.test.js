@@ -65,7 +65,7 @@ describe('ui/project-action.js import & controls', () => {
 
     const result = await importProject(timeline, file, { saveSettingsFn });
     expect(result).not.toBeNull();
-    expect(saveSettingsFn).toHaveBeenCalledWith({ title: 'Projet Importé' });
+    expect(saveSettingsFn).toHaveBeenCalledWith(expect.objectContaining({ title: 'Projet Importé' }));
     expect(timeline.mixer.addTrack).toHaveBeenCalled();
     expect(timeline.render).toHaveBeenCalled();
   });

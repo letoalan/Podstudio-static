@@ -37,6 +37,14 @@ export const renameEpisode = (id, title) => rename(db.STORES.episodes, id, title
 export const deleteRecording = (id) => db.remove(db.STORES.recordings, id);
 export const deleteEpisode = (id) => db.remove(db.STORES.episodes, id);
 
+export async function updateRecordingAnalysis(id, patch = {}) {
+  const item = await db.get(db.STORES.recordings, id);
+  if (!item) return null;
+  const updated = { ...item, ...patch };
+  await db.put(db.STORES.recordings, updated);
+  return updated;
+}
+
 export async function clearAll() {
   await db.clear(db.STORES.recordings);
   await db.clear(db.STORES.episodes);

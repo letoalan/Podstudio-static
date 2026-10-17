@@ -8,6 +8,7 @@ lit la durée réelle d'un fichier audio importé via les métadonnées d'un él
 
 ## API Publique
 - `probeDuration`
+- `probeAudioFeatures`
 
 ## Tests liés
 [`tests/audio-probe.test.js`](../../tests/audio-probe.test.js)
@@ -15,4 +16,5 @@ lit la durée réelle d'un fichier audio importé via les métadonnées d'un él
 ## Exemple d'utilisation
 ```javascript
 const seconds = await probeDuration(file); // 0 si illisible
+const features = await probeAudioFeatures(file); // { silenceRatio, signalClass, ... }
 ```

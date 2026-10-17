@@ -1,150 +1,176 @@
-# Plan d'implémentation — PodStudio (Vite.js)
+# Plan d'implémentation — PodStudio Blocs (Vite.js)
 
-> Réécriture de PodStudio Static (voir `fonctionnement.md`) sous Vite.js, en respectant les règles du projet.
+> Refonte de PodStudio Static (voir `fonctionnement.md`) : une pile **verticale de blocs**
+> illimités. Un clic sur un bloc ouvre son **éditeur timeline** (comme la version actuelle).
+> L'édition est **facultative** : l'interface s'adapte au niveau de l'utilisateur.
+> Inspiration : Mon P'tit Podcast (blocs voix / jingle, rognage, export, sauvegarde projet).
 
 ## 1. Règles imposées
 
 | # | Règle | Contrôle |
 |---|---|---|
-| R1 | Stack : **Vite.js** (JS ES modules, Vitest pour les tests) | `package.json` |
-| R2 | **200 lignes maximum par fichier** : code, CSS, tests, pages wiki, ce plan | `scripts/check-lines.mjs` |
+| R1 | Stack : **Vite.js** (JS ES modules), tests Vitest | `package.json` |
+| R2 | **200 lignes maximum par fichier** (code, CSS, tests, wiki, ce plan) | `scripts/check-lines.mjs` |
 | R3 | Fonction de 40 lignes maximum | ESLint `max-lines-per-function` |
-| R4 | **Doc wiki pour chaque fichier produit** (une page par module) | `scripts/check-wiki.mjs` |
-| R5 | Modularisation : une responsabilité par fichier, dépendances à sens unique | revue + tests |
+| R4 | **Doc wiki pour chaque fichier produit** | `scripts/check-wiki.mjs` |
+| R5 | Modularisation, dépendances à sens unique | ESLint `import/no-cycle` |
 
-Définition de « terminé » pour tout fichier : code < 200 lignes, test associé, page wiki créée, lint vert.
+Fichier terminé = code < 200 lignes + test + page wiki + lint vert.
 
-## 2. Objectifs fonctionnels (hérités de l'existant)
+## 2. Concept : bloc + timeline interne
 
-- Enregistrer la voix au micro (MediaRecorder + visualiseur canvas).
-- Importer des fichiers `.mp3` / `.wav` dans une bibliothèque.
-- Monter plusieurs pistes sur une timeline (offset, volume, fondus).
-- Exporter un MP3 128 kbps (OfflineAudioContext + Web Worker LAME).
-- Gérer les épisodes et générer un flux RSS 2.0 / iTunes.
-- Fonctionner hors ligne (PWA) ; données 100 % locales (IndexedDB).
-- Évolution prévue : timeline extensible type CapCut, pistes musique + voix, synchronisation audio.
+Le projet est une liste verticale de blocs. Chaque bloc contient sa propre mini-timeline.
 
-## 3. Structure du dépôt
+| Propriété du bloc | Description |
+|---|---|
+| `id`, `title`, `subtitle`, `color` | identité |
+| `kind` | `voice`, `jingle`, `music`, `import` (extensible) |
+| `tracks[]` | **2 pistes au départ**, bouton « + » pour en ajouter |
+| `clips[]` | `{ trackId, sourceId, start, offset, duration, gain, fadeIn, fadeOut }` |
+| `edited` | `false` tant que l'utilisateur n'a pas ouvert l'éditeur |
+| `padBefore`, `padAfter` | silences autour du bloc |
+
+Règles :
+- Nombre de blocs **et** de pistes illimité (aucune constante de maximum).
+- Un bloc vide ou jamais édité reste rendu tel quel : **l'édition n'est jamais obligatoire**.
+- Éditer un bloc ne modifie jamais les autres.
+- Le rendu d'un bloc = mixage de ses pistes ; la sortie finale = blocs mis bout à bout.
+
+## 3. Interface progressive (3 niveaux)
+
+| Niveau | Public | Ce qui est visible |
+|---|---|---|
+| Simple | élèves, débutants | pile de blocs, enregistrer, importer, rogner par poignées, ajouter jingle |
+| Intermédiaire | usage courant | + éditeur timeline au clic, 2 pistes, bibliothèque, volume, fondus |
+| Avancé | projets complexes | + pistes illimitées, couper / copier / coller, raccourcis, zoom, multi-sélection |
+
+- Le niveau est un réglage (Paramètres) mémorisé ; il masque ou affiche des outils, jamais des données.
+- Un projet reste ouvrable à tous les niveaux.
+- Suggestion automatique : proposer le niveau supérieur si le bloc dépasse 2 pistes ou 5 clips.
+
+## 4. Outils de l'éditeur timeline (par bloc)
+
+- Ajouter un son depuis la bibliothèque (glisser-déposer ou bouton +).
+- Déplacer un clip, changer de piste.
+- Trimer (poignées gauche / droite).
+- Couper (split à la tête de lecture), supprimer.
+- Copier / coller (presse-papiers interne, collage à la tête de lecture).
+- Volume, fondus, mute / solo par piste.
+- Annuler / rétablir (pile d'historique par bloc).
+- Lecture du bloc seul, ou « à partir de ce bloc ».
+
+## 5. Structure du dépôt
 
 ```
 podstudio/
-├─ index.html
-├─ vite.config.js            # base: '/<repo>/', plugin PWA, test Vitest
-├─ package.json              # scripts: dev, build, test, lint, check
-├─ scripts/
-│  ├─ check-lines.mjs        # échoue si un fichier > 200 lignes
-│  └─ check-wiki.mjs         # échoue si un module n'a pas sa page wiki
+├─ index.html, vite.config.js, package.json
+├─ scripts/        # check-lines.mjs, check-wiki.mjs
 ├─ src/
-│  ├─ main.js                # point d'entrée (orchestration)
-│  ├─ core/                  # logique pure, sans DOM
-│  │  ├─ db.js               # IndexedDB bas niveau
-│  │  ├─ storage.js          # façade recordings / episodes
-│  │  ├─ settings.js         # métadonnées (localStorage)
-│  │  ├─ rss.js              # génération RSS
-│  │  └─ timeline-math.js    # px <-> secondes, graduations
+│  ├─ main.js
+│  ├─ core/        # logique pure, sans DOM
+│  │  ├─ block-model.js     # fabrique + validation (2 pistes par défaut)
+│  │  ├─ project.js         # liste de blocs : add/move/remove/duplicate
+│  │  ├─ clip-ops.js        # split, trim, move, delete (fonctions pures)
+│  │  ├─ clipboard.js       # copier / coller interne
+│  │  ├─ history.js         # annuler / rétablir
+│  │  ├─ timeline-math.js   # px <-> secondes, graduations
+│  │  ├─ level.js           # niveaux d'interface et outils visibles
+│  │  ├─ project-io.js      # export / import du fichier projet
+│  │  ├─ db.js, storage.js  # IndexedDB, blobs, quota
+│  │  ├─ autosave.js        # sauvegarde différée (30 s)
+│  │  ├─ settings.js, rss.js
 │  ├─ audio/
-│  │  ├─ recorder.js         # capture micro
-│  │  ├─ mixer.js            # lecture multipiste
-│  │  ├─ render.js           # OfflineAudioContext
-│  │  └─ encoder.worker.js   # encodage MP3
+│  │  ├─ recorder.js        # capture micro
+│  │  ├─ decode.js          # décodage à la demande + cache LRU
+│  │  ├─ block-player.js    # lecture multipiste d'un bloc
+│  │  ├─ block-render.js    # OfflineAudioContext par bloc
+│  │  ├─ concat.js, wav.js
+│  │  └─ encoder.worker.js  # MP3 (LAME)
 │  ├─ ui/
-│  │  ├─ router.js           # navigation des vues
-│  │  ├─ library.js          # panneau bibliothèque
-│  │  ├─ visualizer.js       # canvas onde
-│  │  ├─ timeline.js         # rendu + drag & drop
-│  │  ├─ episodes.js         # liste des épisodes
-│  │  └─ views/              # guide, studio, editor, settings
-│  └─ styles/
-│     ├─ variables.css       # tokens (dark studio)
-│     ├─ layout.css          # grille, sidebar, bottom nav
-│     ├─ components.css      # boutons, cartes, clips
-│     └─ responsive.css      # mobile / tablette / desktop
-├─ tests/                    # un fichier de test par module
-├─ wiki/                     # une page par fichier + pages transverses
-└─ .github/workflows/        # lint, test, build, deploy
+│  │  ├─ router.js
+│  │  ├─ block-list.js      # pile verticale + glisser-déposer
+│  │  ├─ block-card.js      # carte du bloc (aperçu, clic = éditeur)
+│  │  ├─ block-quick.js     # outils simples (enregistrer, importer)
+│  │  ├─ editor/
+│  │  │  ├─ editor-shell.js   # panneau / modale de l'éditeur
+│  │  │  ├─ track-view.js     # une piste
+│  │  │  ├─ clip-view.js      # une brique + poignées de trim
+│  │  │  ├─ ruler.js, playhead.js, toolbar.js
+│  │  │  └─ shortcuts.js      # Ctrl+C / V / X, S (split), Suppr
+│  │  ├─ sound-library.js, waveform.js, visualizer.js
+│  │  ├─ episodes.js, views/
+│  └─ styles/       # variables, layout, blocks, editor, responsive
+├─ tests/           # un test par module
+├─ wiki/            # une page par fichier + pages transverses
+└─ .github/workflows/
 ```
 
-Si un fichier approche 180 lignes, on le scinde avant de continuer.
+Scinder tout fichier dès 180 lignes.
 
-## 4. Architecture en couches
+## 6. Architecture en couches
 
 ```
 ui  ->  audio  ->  core
 ```
 
-- `core` ne connaît ni le DOM ni Web Audio : testable en Node.
-- `audio` dépend de `core`, jamais de `ui`.
-- `ui` dépend des deux et orchestre via des événements simples (`EventTarget`).
-- Aucune dépendance circulaire (vérifiée par `eslint-plugin-import`).
+`core` reste pur (testable en Node). `ui` communique par `EventTarget` (`block:changed`, `clip:selected`).
 
-## 5. Phases de réalisation
+## 7. Phases de réalisation
 
 ### Phase 0 — Socle et garde-fous
-1. `npm create vite@latest` (vanilla), Vitest, ESLint.
-2. Écrire `check-lines.mjs` et `check-wiki.mjs`, brancher `npm run check`.
-3. Créer le wiki initial : `Home`, `Architecture`, `Règles`, `Journal-décisions`.
-4. Workflow CI : lint -> test -> check -> build.
+Projet Vite, Vitest, ESLint, scripts `check-lines` / `check-wiki`, wiki initial, CI.
 
-Livrable : dépôt vide mais vert en CI.
+### Phase 1 — Modèle (`core`)
+1. `block-model.js` : bloc avec 2 pistes, `edited: false`.
+2. `project.js` : opérations immuables sur la liste (test à 1 000 blocs).
+3. `clip-ops.js`, `clipboard.js`, `history.js` : tests unitaires complets.
+4. `level.js` : table niveau -> outils.
 
-### Phase 1 — Données (`core`)
-1. `db.js` : ouverture `PodcastStudioDB`, magasins `recordings` et `episodes`.
-2. `storage.js` : `save/list/rename/delete` + estimation de quota.
-3. `settings.js` : lecture, écriture, valeurs par défaut.
-4. Tests avec `fake-indexeddb`.
+### Phase 2 — Stockage
+`db.js`, `storage.js` (blobs par source), `autosave.js`, `project-io.js`.
 
-### Phase 2 — Interface et design system
-1. `variables.css` : palette `#080810`, `#8940fa`, `#ff0055`, `#22d3a5`, police Inter.
-2. `layout.css` + `responsive.css` : sidebar desktop, bottom nav mobile.
-3. `router.js` : 5 vues (Guide, Studio, Éditeur, Épisodes, Paramètres).
-4. Vue Paramètres + jauge de stockage (première vue complète).
+### Phase 3 — Pile de blocs
+1. Design system dark studio, layout, mobile (barre basse).
+2. `block-list.js`, `block-card.js` : + bloc, glisser-déposer, renommage, suppression.
+3. `block-quick.js` : enregistrer, importer, jingle, sans ouvrir l'éditeur.
 
-### Phase 3 — Enregistrement et bibliothèque
-1. `recorder.js` : start / pause / stop, sauvegarde du Blob.
-2. `visualizer.js` : onde via `AnalyserNode`, 60 FPS.
-3. `library.js` : import, pré-écoute, renommage, suppression, bottom sheet mobile.
+### Phase 4 — Éditeur timeline par bloc
+1. `editor-shell.js` ouvert au clic sur la carte ; fermeture = retour à la pile.
+2. `track-view.js` : 2 pistes, bouton « + » pour en ajouter.
+3. `clip-view.js` : déplacement, trim, changement de piste.
+4. `toolbar.js` + `shortcuts.js` : couper, copier, coller, annuler.
+5. `sound-library.js` : ajout de sons dans la timeline.
+6. `block-player.js` : lecture multipiste, volume, fondus, mute / solo.
+7. Marquer `edited: true` à la première modification.
 
-### Phase 4 — Montage multipiste
-1. `timeline-math.js` : conversion px/secondes, pas de graduation variable (testé).
-2. `mixer.js` : `addTrack`, `play`, `stop`, volume, fondus (`GainNode`).
-3. `timeline.js` : briques colorées, drag & drop, tête de lecture.
-4. Pistes multiples (voix / musique) et zoom de la timeline.
+### Phase 5 — Niveaux d'interface
+Sélecteur de niveau, masquage des outils, suggestion automatique, tests DOM.
 
-### Phase 5 — Export et publication
-1. `render.js` : rendu `OfflineAudioContext`.
-2. `encoder.worker.js` : Float32 -> Int16 -> MP3 (LAME, blocs de 1152).
-3. `episodes.js` : lecteur, téléchargement, suppression.
-4. `rss.js` : flux `podcast.xml` (balises `itunes:*`, `enclosure`).
+### Phase 6 — Rendu et export
+`block-render.js` (un contexte par bloc), `concat.js`, `wav.js`, MP3 worker,
+durée totale avant export, `episodes.js`, `rss.js`.
 
-### Phase 6 — PWA et déploiement
-1. Plugin PWA (manifest + service worker), test hors ligne.
-2. `base` de Vite adapté au dépôt ; workflow GitHub Pages.
-3. Audit Lighthouse, tests manuels iOS / Android / desktop.
+### Phase 7 — PWA et déploiement
+Manifest, service worker, test hors ligne, GitHub Pages, Lighthouse, tests iOS / Android.
 
-## 6. Stratégie de tests
+### Phase 8 — Options
+Fondu enchaîné entre blocs, modèles de projet, vue d'ensemble horizontale.
 
-| Niveau | Outil | Cibles |
-|---|---|---|
-| Unitaire | Vitest | `timeline-math`, `rss`, `settings`, `storage` |
-| DOM | Vitest + jsdom | `router`, `library`, vues |
-| Audio | mocks Web Audio | `mixer`, `render`, `recorder` |
-| Manuel | navigateurs réels | micro, export MP3, hors ligne |
+## 8. Risques et parades
 
-## 7. Documentation wiki (règle R4)
+| Risque | Parade |
+|---|---|
+| Mémoire (blocs et pistes infinis) | Blobs en IndexedDB, décodage du seul bloc ouvert |
+| Rendu long | Un contexte par bloc, puis concaténation |
+| Liste longue | Affichage virtualisé, formes d'onde à l'affichage |
+| Complexité de l'éditeur | Niveaux progressifs, outils masqués par défaut |
+| Perte de travail | Autosave + fichier projet + historique |
+| Safari iOS | Tester `MediaRecorder` tôt, format de repli |
 
-- Une page par fichier : `wiki/modules/<nom>.md`, générée depuis un modèle.
-- Contenu type : rôle, API publique (fonctions, paramètres), dépendances, tests liés, exemple.
-- Pages transverses : Architecture, Règles de contribution, Journal des décisions, Guide utilisateur.
-- `check-wiki.mjs` compare `src/**` et `wiki/modules/**` et échoue s'il manque une page.
-- Publication : dossier `wiki/` recopié vers le wiki GitHub par la CI.
+## 9. Tests et wiki
 
-## 8. Risques et décisions
-
-- LAME : charger `lamejs` en module dans le worker plutôt qu'en script global.
-- Quota IndexedDB : avertir l'utilisateur au-delà de 80 % d'usage.
-- Safari iOS : `MediaRecorder` limité -> prévoir un format de repli et le tester tôt.
-- Fichiers qui grossissent : scinder dès 180 lignes (règle R2).
-
-## 9. Ordre de livraison conseillé
-
-Phase 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6. Chaque phase se termine par : tests verts, wiki à jour, `npm run check` réussi.
+- Unitaire : `block-model`, `project`, `clip-ops`, `clipboard`, `history`, `timeline-math`, `level`, `rss`.
+- Stockage : `fake-indexeddb`. DOM : jsdom. Audio : mocks Web Audio.
+- Wiki : `wiki/modules/<nom>.md` par fichier (rôle, API, dépendances, tests, exemple).
+- Pages transverses : Architecture, Modèle de bloc, Niveaux d'interface, Contribution, Décisions.
+- Chaque phase se termine par : tests verts, wiki à jour, `npm run check` réussi.

@@ -1,10 +1,10 @@
 # Module `core-settings`
 
 ## Rôle
-métadonnées du podcast (titre, auteur, langue…) persistées dans localStorage.
+métadonnées du podcast (titre, auteur, langue…) et couleurs des blocs persistées dans localStorage.
 
 ## Dépendances
-- Aucune
+- `./palette.js`
 
 ## API Publique
 - `SETTINGS_KEY`

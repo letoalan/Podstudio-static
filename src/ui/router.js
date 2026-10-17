@@ -32,6 +32,12 @@ export function initRouter(root = document, win = window) {
   };
   root.querySelectorAll('[data-nav]').forEach((button) => {
     button.addEventListener('click', () => go(button.dataset.nav));
+    button.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        go(button.dataset.nav);
+      }
+    });
   });
   on('view:go', go);
   win.addEventListener('hashchange', () => go(parseHash(win.location.hash)));

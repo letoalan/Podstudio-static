@@ -1,20 +1,12 @@
 # Module `ui-views-editor`
 
 ## Rôle
-vue Éditeur — assemble transport, zoom, édition (copier/couper/coller/scinder), timeline, inspecteur et export.
+Vue Éditeur unifié — connectée aux blocs du projet, intégrant multipiste, transport, zoom, historique et inspecteur.
 
 ## Dépendances
 - `../../core/bus.js`
-- `../../audio/mixer.js`
-- `../clipboard.js`
-- `../clip-inspector.js`
-- `../project-action.js`
+- `../editor/editor-shell.js`
 - `../dom.js`
-- `../export-action.js`
-- `../timeline.js`
-- `../timeline-drop.js`
-- `../toast.js`
-- `../transport.js`
 
 ## API Publique
 - `mountEditor`
@@ -24,5 +16,5 @@ Validation fonctionnelle et tests d’intégration.
 
 ## Exemple d'utilisation
 ```javascript
-mountEditor(document.getElementById('view-editor'), { mixer });
+mountEditor(document.getElementById('view-editor'));
 ```

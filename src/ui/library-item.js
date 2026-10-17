@@ -35,6 +35,12 @@ function actionButton(label, className, onClick) {
 }
 
 export function buildLibraryItem(item, handlers, createUrl = makeUrl) {
+  const isImport = item.source === 'import';
+  const thumb = h('div', {
+    class: `lib-thumb ${isImport ? 'thumb-music' : 'thumb-mic'}`,
+    'aria-hidden': 'true',
+  }, h('span', { class: 'lib-thumb-icon' }, kindIcon(item)));
+
   const title = h('span', {
     class: 'lib-title',
     role: 'button',
@@ -42,6 +48,7 @@ export function buildLibraryItem(item, handlers, createUrl = makeUrl) {
     title: 'Cliquer pour renommer',
     onClick: () => startRename(title, item, handlers.onRename),
   }, item.title || 'Sans titre');
+
   return h('article', {
     class: 'lib-item',
     role: 'listitem',
@@ -52,10 +59,12 @@ export function buildLibraryItem(item, handlers, createUrl = makeUrl) {
       event.dataTransfer.effectAllowed = 'copy';
     },
   },
-  h('div', { class: 'lib-head' }, h('span', { 'aria-hidden': 'true' }, kindIcon(item)), title,
-    h('span', { class: 'lib-dur' }, durationLabel(item))),
+  h('div', { class: 'lib-item-main' },
+    thumb,
+    h('div', { class: 'lib-item-meta' }, title, h('span', { class: 'lib-dur' }, durationLabel(item))),
+  ),
   h('audio', { controls: true, preload: 'none', src: createUrl(item.audio) }),
   h('div', { class: 'lib-actions' },
-    actionButton('＋ Timeline', 'secondary', () => handlers.onAdd(item)),
+    actionButton('＋ Carte', 'primary', () => handlers.onAdd(item)),
     actionButton('Supprimer', 'danger-ghost', () => handlers.onDelete(item))));
 }

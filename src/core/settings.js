@@ -1,7 +1,9 @@
 /**
- * Rôle : métadonnées du podcast (titre, auteur, langue…) persistées dans localStorage.
+ * Rôle : métadonnées du podcast (titre, auteur, langue…) et couleurs des blocs persistées dans localStorage.
  * Exemple : saveSettings({ title: 'Mon émission' }); getSettings().title;
  */
+import { DEFAULT_PALETTE } from './palette.js';
+
 export const SETTINGS_KEY = 'podcast_settings';
 
 export const DEFAULT_SETTINGS = Object.freeze({
@@ -11,6 +13,8 @@ export const DEFAULT_SETTINGS = Object.freeze({
   email: '',
   language: 'fr',
   siteUrl: '',
+  palette: DEFAULT_PALETTE,
+  colorMode: 'cycle',
 });
 
 const defaultStorage = () => globalThis.localStorage;

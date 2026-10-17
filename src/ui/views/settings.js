@@ -8,6 +8,7 @@ import { emit, on } from '../../core/bus.js';
 import { formatBytes } from '../../core/format.js';
 import { h } from '../dom.js';
 import { showToast } from '../toast.js';
+import { mountPaletteEditor } from '../palette-editor.js';
 
 export const FIELDS = [
   { name: 'title', label: 'Titre du podcast', type: 'text' },
@@ -47,6 +48,13 @@ export function mountSettings(container, deps = {}) {
   const current = getSettings();
   const save = h('button', { type: 'submit', class: 'btn primary full-width', id: 'btn-save-settings' }, 'Sauvegarder');
   const form = h('form', { id: 'settings-form', class: 'card' }, FIELDS.map((f) => buildField(f, current[f.name] ?? '')), save);
+
+  const paletteCard = h('div', { class: 'card' }, h('h3', {}, 'Couleurs des blocs'));
+  mountPaletteEditor(paletteCard, {
+    settings: current,
+    onChange: (vals) => saveSettings({ ...getSettings(), ...vals }),
+  });
+
   const refs = {
     bar: h('progress', { max: 100, value: 0, 'aria-label': 'Espace de stockage utilisé' }),
     text: h('span', { role: 'status' }, 'Calcul…'),
@@ -54,7 +62,7 @@ export function mountSettings(container, deps = {}) {
   };
   const reset = h('button', { type: 'button', class: 'btn danger full-width', id: 'btn-delete-all' }, 'Tout réinitialiser');
   refs.card = h('div', { class: 'card danger-zone' }, h('h3', {}, 'Stockage local'), refs.bar, refs.text, refs.warning, reset);
-  container.append(h('div', { class: 'section-header' }, h('h2', {}, 'Paramètres')), form, refs.card);
+  container.append(h('div', { class: 'section-header' }, h('h2', {}, 'Paramètres')), form, paletteCard, refs.card);
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();

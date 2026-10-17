@@ -17,6 +17,7 @@ façade métier du stockage (enregistrements et épisodes) + estimation du quota
 - `renameEpisode`
 - `deleteRecording`
 - `deleteEpisode`
+- `updateRecordingAnalysis`
 - `isQuotaCritical`
 
 ## Tests liés

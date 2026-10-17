@@ -1,68 +1,67 @@
 /**
- * Rôle : vue Éditeur — assemble transport, zoom, édition (copier/couper/coller/scinder), timeline, inspecteur et export.
- * Exemple : mountEditor(document.getElementById('view-editor'), { mixer });
+ * Rôle : vue Éditeur unifié — connectée aux blocs du projet, intégrant multipiste, transport, zoom, historique et inspecteur.
+ * Exemple : mountEditor(document.getElementById('view-editor'));
  */
-import { on } from '../../core/bus.js';
-import { Mixer } from '../../audio/mixer.js';
-import { copyClip, cutClip, pasteClip, splitAtPlayhead } from '../clipboard.js';
-import { mountInspector } from '../clip-inspector.js';
-import { createProjectControls } from '../project-action.js';
+import { on, emit } from '../../core/bus.js';
+import { mountEditorShell } from '../editor/editor-shell.js';
 import { h } from '../dom.js';
-import { runExport } from '../export-action.js';
-import { Timeline } from '../timeline.js';
-import { addRecordingToTimeline } from '../timeline-drop.js';
-import { showToast } from '../toast.js';
-import { Transport } from '../transport.js';
 
-function zoomButtons(timeline) {
-  const make = (label, text, factor) => h('button', {
-    type: 'button', class: 'btn secondary btn-sm', 'aria-label': label, onClick: () => timeline.zoomBy(factor),
-  }, text);
-  return h('div', { class: 'zoom-controls' }, make('Zoom arrière', '−', 1 / 1.5), make('Zoom avant', '+', 1.5));
+function renderEmptyState() {
+  const btn = h('button', {
+    type: 'button', class: 'btn primary btn-sm',
+    onClick: () => emit('view:go', 'studio'),
+  }, '← Revenir aux blocs');
+  return h('div', { class: 'empty-editor-state' },
+    h('p', {}, 'Aucun bloc actif sélectionné à éditer. Sélectionnez une carte dans le studio.'),
+    btn);
 }
 
-function editControls(timeline) {
-  const make = (title, label, action) => h('button', {
-    type: 'button', class: 'btn secondary btn-sm', title, 'aria-label': title, onClick: action,
-  }, label);
-  const getSelected = () => timeline.getSelectedTrack();
+function mountActiveBlockShell(shellContainer, { block, rank, onUpdateBlock, onClose }) {
+  shellContainer.innerHTML = '';
+  if (!block) {
+    shellContainer.append(renderEmptyState());
+    return null;
+  }
+  return mountEditorShell(shellContainer, { block, rank, onUpdateBlock, onClose });
+}
 
-  return h('div', { class: 'edit-controls' },
-    make('Copier le clip (Ctrl+C)', '📋 Copier', () => copyClip(getSelected())),
-    make('Couper le clip (Ctrl+X)', '✂️ Couper', () => cutClip(getSelected(), timeline)),
-    make('Coller le clip (Ctrl+V)', '📥 Coller', () => pasteClip(timeline)),
-    make('Scinder au curseur rouge (S)', '✂️ Scinder', () => splitAtPlayhead(timeline)));
+function bindEditorBusEvents(state, render) {
+  on('editor:open', ({ block, rank, onUpdateBlock }) => {
+    if (onUpdateBlock) state.deps.onUpdateBlock = onUpdateBlock;
+    render(block, rank || 1);
+  });
+  on('block:selected', ({ block, rank }) => {
+    if (!state.activeBlock || state.activeBlock.id !== block?.id) render(block, rank || 1);
+  });
 }
 
 export function mountEditor(container, deps = {}) {
-  const mixer = deps.mixer ?? new Mixer();
-  const toolbar = h('div', { class: 'editor-toolbar' });
-  const timelineHost = h('div', { class: 'editor-timeline' });
-  const inspectorHost = h('div', { class: 'inspector' });
-  const exportButton = h('button', { type: 'button', class: 'btn primary', id: 'btn-export-mix' }, 'Exporter en MP3');
+  const state = { activeBlock: deps.block || null, activeRank: deps.rank || 1, currentShell: null, deps };
+  const wrapper = h('div', { class: 'unified-editor-view' });
+  const shellContainer = h('div', { class: 'editor-shell-container' });
+  wrapper.append(shellContainer);
+  container.innerHTML = '';
+  container.append(wrapper);
 
-  const holder = {};
-  const timeline = new Timeline(timelineHost, {
-    mixer, storage: deps.storage, onSelect: (track) => holder.inspector?.show(track),
-  });
-  const projectControls = createProjectControls(timeline);
-  const headerActions = h('div', { class: 'header-actions' }, projectControls, exportButton);
-  container.append(
-    h('div', { class: 'section-header' }, h('h2', {}, 'Éditeur'), headerActions), toolbar, timelineHost, inspectorHost);
+  function render(block, rank) {
+    state.activeBlock = block;
+    state.activeRank = rank;
+    state.currentShell = mountActiveBlockShell(shellContainer, {
+      block: state.activeBlock,
+      rank: state.activeRank,
+      onUpdateBlock: (updated) => {
+        state.activeBlock = updated;
+        state.deps.onUpdateBlock?.(updated);
+        emit('block:updated', updated);
+      },
+      onClose: () => emit('view:go', 'studio'),
+    });
+  }
 
-  const transport = new Transport(toolbar, { mixer, timeline, raf: deps.raf, caf: deps.caf });
-  toolbar.append(editControls(timeline), zoomButtons(timeline));
-  holder.inspector = mountInspector(inspectorHost, {
-    mixer,
-    onRemove: (id) => timeline.removeClip(id),
-    onCopy: (track) => copyClip(track),
-    onCut: (track) => cutClip(track, timeline),
-  });
-
-  exportButton.addEventListener('click', () => runExport(exportButton, { mixer, storage: deps.storage, exporter: deps.exporter }));
-  on('timeline:add', async (item) => {
-    const id = await addRecordingToTimeline(timeline, item);
-    if (id) showToast(`« ${item.title} » ajouté à la timeline`, { type: 'success' });
-  });
-  return { mixer, timeline, transport };
+  bindEditorBusEvents(state, render);
+  render(state.activeBlock, state.activeRank);
+  return {
+    destroy: () => state.currentShell?.destroy?.(),
+    openBlock: (b, r) => render(b, r),
+  };
 }

@@ -14,8 +14,17 @@ function ensureRegion(root) {
 }
 
 export function showToast(message, options = {}) {
-  const { type = 'info', duration = 3500, root = document.body } = options;
+  const { type = 'info', duration = 3500, root = document.body, action } = options;
   const toast = h('div', { class: `toast toast--${type}` }, message);
+  if (action?.label && action?.onClick) {
+    const btn = h('button', { type: 'button', class: 'btn btn-sm btn-toast-action' }, action.label);
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toast.remove();
+      action.onClick();
+    });
+    toast.append(btn);
+  }
   ensureRegion(root).append(toast);
   if (duration > 0) setTimeout(() => toast.remove(), duration);
   return toast;

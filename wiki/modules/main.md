@@ -13,7 +13,7 @@ point d'entrée — monte les vues, les bibliothèques (bureau + mobile), le rou
 - `./ui/views/editor.js`
 - `./ui/views/guide.js`
 - `./ui/views/settings.js`
-- `./ui/views/studio.js`
+- `./ui/views/blocks.js`
 - `./pwa.js`
 
 ## API Publique

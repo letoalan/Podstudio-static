@@ -3,7 +3,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, extname } from 'node:path';
 
 const MAX_LINES = 200;
-const ROOTS = ['src', 'tests', 'wiki', 'scripts', 'index.html', 'new.md'];
+const ROOTS = ['src', 'tests', 'wiki', 'scripts', 'index.html', 'new.md', 'plan.md'];
 const EXTENSIONS = new Set(['.js', '.mjs', '.css', '.html', '.md']);
 
 function* walk(path) {

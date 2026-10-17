@@ -18,7 +18,7 @@
 </head>
 <body>
   <header class="app-header">
-    <h1 class="logo">
+    <h1 class="logo" role="button" tabindex="0" data-nav="studio" title="Retour au Studio" style="cursor: pointer;">
       <span class="logo-icon" aria-hidden="true">🎙️</span>
       <span class="logo-text">PodStudio</span>
       <span class="badge">Vite</span>
@@ -30,8 +30,6 @@
     <aside class="app-sidebar">
       <nav class="main-nav" aria-label="Navigation principale">
         <button type="button" class="nav-btn" data-nav="guide"><span class="icon" aria-hidden="true">📖</span><span class="label">Guide</span></button>
-        <button type="button" class="nav-btn" data-nav="studio"><span class="icon" aria-hidden="true">🔴</span><span class="label">Studio</span></button>
-        <button type="button" class="nav-btn" data-nav="editor"><span class="icon" aria-hidden="true">🎚️</span><span class="label">Éditeur</span></button>
         <button type="button" class="nav-btn" data-nav="episodes"><span class="icon" aria-hidden="true">🚀</span><span class="label">Épisodes</span></button>
         <span class="nav-spacer"></span>
         <button type="button" class="nav-btn" data-nav="settings"><span class="icon" aria-hidden="true">⚙️</span><span class="label">Paramètres</span></button>
@@ -52,8 +50,6 @@
 
   <nav class="mobile-bottom-nav" aria-label="Navigation mobile">
     <button type="button" class="mobile-nav-btn" data-nav="guide"><span class="icon" aria-hidden="true">📖</span><span class="label">Guide</span></button>
-    <button type="button" class="mobile-nav-btn" data-nav="studio"><span class="icon" aria-hidden="true">🔴</span><span class="label">Studio</span></button>
-    <button type="button" class="mobile-nav-btn" data-nav="editor"><span class="icon" aria-hidden="true">🎚️</span><span class="label">Éditeur</span></button>
     <button type="button" class="mobile-nav-btn" data-nav="episodes"><span class="icon" aria-hidden="true">🚀</span><span class="label">Épisodes</span></button>
     <button type="button" class="mobile-nav-btn" data-nav="settings"><span class="icon" aria-hidden="true">⚙️</span><span class="label">Réglages</span></button>
   </nav>

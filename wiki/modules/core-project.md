@@ -1,22 +1,31 @@
 # Module `core-project`
 
 ## Rôle
-schéma, validation et formatage des fichiers de projet JSON de PodStudio.
+gestion immuable du projet et de sa ligne de blocs numérotés (ajout, insertion, déplacement, suppression, duplication).
 
 ## Dépendances
-- Aucune
+- `./block-model.js`
+- `./palette.js`
+- `./project-io.js`
 
 ## API Publique
-- `PROJECT_FORMAT`
-- `PROJECT_VERSION`
-- `sanitizeFileName`
-- `createProjectData`
-- `validateProject`
+- `createProject`
+- `findBlock`
+- `getBlockNumber`
+- `getBlockColor`
+- `insertBlockAt`
+- `addBlock`
+- `removeBlock`
+- `moveBlock`
+- `duplicateBlock`
+- `updateBlock`
+- `getPlayableBlocks`
+- `getProjectDuration`
 
 ## Tests liés
 [`tests/core-project.test.js`](../../tests/core-project.test.js)
 
 ## Exemple d'utilisation
 ```javascript
-const project = createProjectData(settings, tracks); validateProject(project);
+const p2 = insertBlockAt(project, 1, newBlock); getBlockNumber(p2, newBlock.id); // 2
 ```
